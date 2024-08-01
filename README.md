@@ -27,4 +27,8 @@ sudo ./create_service.sh single r3
 Param one is mode: single, exec or consensus.  
 Param two is branch name of https://github.com/Web3-Pi/Ethereum-On-Raspberry-Pi repository.
 
+**single** - Single device mode: execusion, consensus clients and monitoring   
+**exec** - Dual devices mode: excution client   
+**consensus** - Dual devices mode: consensus client
+
 Output file is in: `/opt/web3pi/ubuntu_img/ubuntu-24.04-preinstalled-server-arm64+raspi.img`
