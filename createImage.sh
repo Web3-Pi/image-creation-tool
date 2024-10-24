@@ -83,7 +83,7 @@ mkdir -p $SCRIPT_DIR/tmp
 
 # Install required software
 apt-get update
-apt-get install -y git git-extras qemu-utils kpartx
+apt-get install -y git qemu-utils kpartx unzip
 
 # Download official Ubuntu image for Raspberry Pi
 if [ -f "$SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img.xz" ]; then
@@ -106,29 +106,29 @@ echo "ls -lh $SCRIPT_DIR/tmp/"
 ls -lh $SCRIPT_DIR/tmp/
 
 echo 
-sudo modprobe nbd
-sudo modprobe nbd max_part=16
+modprobe nbd
+modprobe nbd max_part=16
 lsmod | grep nbd
-sudo chown root:disk /dev/nbd0
-sudo qemu-nbd --disconnect /dev/nbd0
+chown root:disk /dev/nbd0
+qemu-nbd --disconnect /dev/nbd0
 
 # Attach the image
-sudo qemu-nbd --format=raw --connect=/dev/nbd0 "$SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img"
+qemu-nbd --format=raw --connect=/dev/nbd0 "$SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img"
 
 # Check which partitions are available on the nbd0 device
-sudo fdisk -l /dev/nbd0
+fdisk -l /dev/nbd0
 
 # Mount the boot partition
-sudo mkdir -p /mnt/boot
-sudo mount /dev/nbd0p1 /mnt/boot
+mkdir -p /mnt/boot
+mount /dev/nbd0p1 /mnt/boot
 
 echo 
 echo "ls -lh /mnt/boot"
 ls -lh /mnt/boot
 
 # Mount the root partition
-sudo mkdir -p /mnt/root
-sudo mount /dev/nbd0p2 /mnt/root
+mkdir -p /mnt/root
+mount /dev/nbd0p2 /mnt/root
 
 echo 
 echo "ls -lh /mnt/root"
@@ -138,9 +138,9 @@ ls -lh /mnt/root
 echo 
 mkdir -p /mnt/root/opt/web3pi
 
-git-force-clone --branch ${BRANCH} https://github.com/Web3-Pi/Ethereum-On-Raspberry-Pi.git /mnt/root/opt/web3pi/Ethereum-On-Raspberry-Pi
-git-force-clone https://github.com/Web3-Pi/basic-system-monitor.git /mnt/root/opt/web3pi/basic-system-monitor
-git-force-clone https://github.com/Web3-Pi/basic-eth2-node-monitor.git /mnt/root/opt/web3pi/basic-eth2-node-monitor
+git clone -b ${BRANCH} https://github.com/Web3-Pi/Ethereum-On-Raspberry-Pi.git /mnt/root/opt/web3pi/Ethereum-On-Raspberry-Pi
+git clone https://github.com/Web3-Pi/basic-system-monitor.git /mnt/root/opt/web3pi/basic-system-monitor
+git clone https://github.com/Web3-Pi/basic-eth2-node-monitor.git /mnt/root/opt/web3pi/basic-eth2-node-monitor
 
 cp /mnt/root/opt/web3pi/Ethereum-On-Raspberry-Pi/distros/raspberry_pi/rc.local /mnt/root/etc/rc.local
 chmod +x /mnt/root/etc/rc.local
@@ -159,31 +159,66 @@ fi
 
 echo
 mkdir -p /mnt/root/opt/web3pi/influxdb
-wget -P /mnt/root/opt/web3pi/influxdb https://dl.influxdata.com/influxdb/releases/influxdb_1.8.10_arm64.deb
+wget https://dl.influxdata.com/influxdb/releases/influxdb_1.8.10_arm64.deb -P /mnt/root/opt/web3pi/influxdb
 
 echo
 # pieeprom-2024-06-05.bin is with our config file
 cp $SCRIPT_DIR/fw/2712/pieeprom-2024-06-05.bin /mnt/root/lib/firmware/raspberrypi/bootloader-2712/default/
 cp $SCRIPT_DIR/fw/2711/pieeprom-2024-04-15.bin /mnt/root/lib/firmware/raspberrypi/bootloader-2711/default/
 
+# rm $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip
+wget https://github.com/Web3-Pi/web3-pi-dashboard/releases/latest/download/web3-pi-dashboard-bin.zip -O $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip
+unzip $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip -d /mnt/root/opt/web3pi/
 
-# check
-echo
-ls /mnt/root/opt/web3pi/influxdb
-echo
-ls /mnt/root/lib/firmware/raspberrypi/bootloader-2712/default/
-echo
+chmod +x /mnt/root/opt/web3pi/web3-pi-dashboard-bin/hwmonitor
 
-mv -f $SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img $SCRIPT_DIR/output/$OUTPUT_FILE_NAME
+echo
+echo "ls -lh /mnt/root/opt/web3pi"
+ls -lh /mnt/root/opt/web3pi
+
+echo
+echo "ls -lh /mnt/root/opt/web3pi/influxdb"
+ls -lh /mnt/root/opt/web3pi/influxdb
+
+# Create the service file for web3-pi-dashboard
+cat <<EOF > "/mnt/root/etc/systemd/system/w3p_lcd.service"
+[Unit]
+Description=Run Web3Pi LCD Dashboard - bin
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/web3pi/web3-pi-dashboard-bin
+ExecStart=/opt/web3pi/web3-pi-dashboard-bin/hwmonitor
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Activate the service – To ensure the service starts on boot, create a symbolic link in the appropriate directory.
+sudo ln -s /mnt/root/etc/systemd/system/w3p_lcd.service /mnt/root/etc/systemd/system/multi-user.target.wants/w3p_lcd.service
+
 
 echo
 # Umount partitions
-sudo umount /mnt/boot
-sudo umount /mnt/root
+umount /mnt/boot
+umount /mnt/root
 # Disconnect image/device
-sudo qemu-nbd --disconnect /dev/nbd0
+qemu-nbd --disconnect /dev/nbd0
+
+
+# Delete the previously created file if exist
+if [ -f "$SCRIPT_DIR/output/$OUTPUT_FILE_NAME" ]; then
+  echo
+  echo "$SCRIPT_DIR/output/$OUTPUT_FILE_NAME file allready exist. Deleting..."
+  rm $SCRIPT_DIR/output/$OUTPUT_FILE_NAME
+fi
+# Move ready file to output dir
+mv -f $SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img $SCRIPT_DIR/output/$OUTPUT_FILE_NAME
 
 echo
 echo "Done! Modified image .img file is in output dir"
+echo "$SCRIPT_DIR/output/$OUTPUT_FILE_NAME"
 echo
 exit 0
