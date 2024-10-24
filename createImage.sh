@@ -8,18 +8,17 @@ function display_help {
     echo
     echo "Bash script to generate a Web3 Pi image (.img) based on Ubuntu for Raspberry Pi"
     echo
-    echo "Usage: sudo ./createImage.sh [MODE] [BRANCH] [OUTPUT_FILE_NAME]"
+    echo "Usage: sudo ./createImage.sh [MODE] [BRANCH]"
     echo
     echo "Parameters:"
     echo "  MODE   : One of 'single', 'exec', or 'consensus'. (Required)"
     echo "  BRANCH : Branch name from the repository https://github.com/Web3-Pi/Ethereum-On-Raspberry-Pi (e.g., 'r0.7.1'). (Required)"
-    echo "  OUTPUT_FILE_NAME : Name of the file where the generated image will be saved. (Required)"
     echo
     echo "Options:"
     echo "  -?     : Display this help message."
     echo
     echo "Example:"
-    echo "  sudo ./createImage.sh single r0.7.1 Web3Pi_Single_Device.img"
+    echo "  sudo ./createImage.sh single r0.7.1"
     echo
 }
 
@@ -35,8 +34,8 @@ if [ "$1" == "-?" ]; then
     exit 0
 fi
 
-# Check that we have exactly three arguments
-if [ $# -ne 3 ]; then
+# Check that we have exactly two arguments
+if [ $# -ne 2 ]; then
     echo "Error: Incorrect number of arguments." >&2
     display_help
     exit 1
@@ -45,7 +44,6 @@ fi
 # Assigning arguments to variables
 MODE=$1
 BRANCH=$2
-OUTPUT_FILE_NAME=$3
 
 # Validate MODE parameter
 if [[ "$MODE" != "single" && "$MODE" != "exec" && "$MODE" != "consensus" ]]; then
@@ -61,16 +59,11 @@ if [[ -z "$BRANCH" ]]; then
     exit 1
 fi
 
-# Validate OUTPUT_FILE_NAME (simple check)
-if [[ -z "$OUTPUT_FILE_NAME" ]]; then
-    echo "Error: OUTPUT_FILE_NAME cannot be empty." >&2
-    display_help
-    exit 1
-fi
+
 
 # If all validations pass, proceed with the script logic
 echo 
-echo "Generating Web3 Pi image with MODE: $MODE, BRANCH: $BRANCH, and saving to: $OUTPUT_FILE_NAME"
+echo "Generating Web3 Pi image with MODE: $MODE, BRANCH: $BRANCH"
 
 # Get the directory where the script is located
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
@@ -145,15 +138,20 @@ git clone https://github.com/Web3-Pi/basic-eth2-node-monitor.git /mnt/root/opt/w
 cp /mnt/root/opt/web3pi/Ethereum-On-Raspberry-Pi/distros/raspberry_pi/rc.local /mnt/root/etc/rc.local
 chmod +x /mnt/root/etc/rc.local
 
+
 echo
+OUTPUT_FILE_NAME="Web3Pi_image.img"
 if [ "$MODE" = "consensus" ]; then
   echo "MODE consensus"
+  OUTPUT_FILE_NAME="Web3Pi_Dual_Devices_Consensus.img"
   cp /mnt/root/opt/web3pi/Ethereum-On-Raspberry-Pi/distros/raspberry_pi/config-consensus.txt /mnt/boot/config.txt
 elif [ "$MODE" = "exec" ]; then
   echo "MODE exec"
+  OUTPUT_FILE_NAME="Web3Pi_Dual_Devices_Execution.img"
   cp /mnt/root/opt/web3pi/Ethereum-On-Raspberry-Pi/distros/raspberry_pi/config-exec.txt /mnt/boot/config.txt
 else
   echo "MODE single"
+  OUTPUT_FILE_NAME="Web3Pi_Single_Device.img"
   cp /mnt/root/opt/web3pi/Ethereum-On-Raspberry-Pi/distros/raspberry_pi/config.txt /mnt/boot/config.txt
 fi
 
