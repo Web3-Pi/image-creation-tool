@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Web3 Pi .img creation tool v.0.1.2
+# Web3 Pi .img creation tool
 #
 
 # Function to display help message
