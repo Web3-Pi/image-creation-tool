@@ -197,6 +197,8 @@ EOF
 # Activate the service – To ensure the service starts on boot, create a symbolic link in the appropriate directory.
 sudo ln -s /mnt/root/etc/systemd/system/w3p_lcd.service /mnt/root/etc/systemd/system/multi-user.target.wants/w3p_lcd.service
 
+# Save the branch name from which this image was built.
+echo "$BRANCH" > /mnt/root/opt/web3pi/version.txt
 
 echo
 # Umount partitions
