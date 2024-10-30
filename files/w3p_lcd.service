@@ -1,0 +1,12 @@
+[Unit]
+Description=Run Web3Pi LCD Dashboard - bin
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/web3pi/web3-pi-dashboard-bin
+ExecStart=/opt/web3pi/web3-pi-dashboard-bin/hwmonitor
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

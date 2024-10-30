@@ -179,23 +179,16 @@ echo "ls -lh /mnt/root/opt/web3pi/influxdb"
 ls -lh /mnt/root/opt/web3pi/influxdb
 
 # Create the service file for web3-pi-dashboard
-cat <<EOF > "/mnt/root/etc/systemd/system/w3p_lcd.service"
-[Unit]
-Description=Run Web3Pi LCD Dashboard - bin
-After=network.target
-
-[Service]
-WorkingDirectory=/opt/web3pi/web3-pi-dashboard-bin
-ExecStart=/opt/web3pi/web3-pi-dashboard-bin/hwmonitor
-Restart=on-failure
-RestartSec=30
-
-[Install]
-WantedBy=multi-user.target
-EOF
+cp $SCRIPT_DIR/files/w3p_lcd.service /mnt/root/etc/systemd/system/w3p_lcd.service
 
 # Activate the service – To ensure the service starts on boot, create a symbolic link in the appropriate directory.
 sudo ln -s /mnt/root/etc/systemd/system/w3p_lcd.service /mnt/root/etc/systemd/system/multi-user.target.wants/w3p_lcd.service
+
+# Delete default user-data file
+rm /mnt/boot/user-data
+
+# Copy our user-data file to boot partition
+cp $SCRIPT_DIR/files/user-data /mnt/boot/
 
 # Save the branch name from which this image was built.
 echo "$BRANCH" > /mnt/root/opt/web3pi/version.txt
