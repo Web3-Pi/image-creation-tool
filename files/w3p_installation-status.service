@@ -1,0 +1,14 @@
+[Unit]
+Description=Web3 Pi installation status page
+After=network.target
+
+[Service]
+Environment="PORT=80"
+Environment="JLOG_PATH=/opt/web3pi/status.jlog"
+Environment="LOG_PATH=/var/log/web3pi.log"
+ExecStart=/opt/web3pi/installation-status/installation-status-app
+Restart=always
+RestartSec=60s
+
+[Install]
+WantedBy=multi-user.target

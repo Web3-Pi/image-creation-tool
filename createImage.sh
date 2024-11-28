@@ -75,8 +75,8 @@ mkdir -p $SCRIPT_DIR/output
 mkdir -p $SCRIPT_DIR/tmp
 
 # Install required software
-apt-get update
-apt-get install -y git qemu-utils kpartx unzip
+#apt-get update
+#apt-get install -y git qemu-utils kpartx unzip
 
 # Download official Ubuntu image for Raspberry Pi
 if [ -f "$SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img.xz" ]; then
@@ -183,6 +183,24 @@ cp $SCRIPT_DIR/files/w3p_lcd.service /mnt/root/etc/systemd/system/w3p_lcd.servic
 
 # Activate the service – To ensure the service starts on boot, create a symbolic link in the appropriate directory.
 sudo ln -s /mnt/root/etc/systemd/system/w3p_lcd.service /mnt/root/etc/systemd/system/multi-user.target.wants/w3p_lcd.service
+
+
+
+# installation-status
+# copy binnary app
+mkdir /mnt/root/opt/web3pi/installation-status
+wget https://github.com/Web3-Pi/installation-status/releases/latest/download/app -O /mnt/root/opt/web3pi/installation-status/installation-status-app
+#cp $SCRIPT_DIR/files/installation-status-app /mnt/root/opt/web3pi/installation-status/installation-status-app
+chmod +x /mnt/root/opt/web3pi/installation-status/installation-status-app
+# Create the service file for installation-status
+cp $SCRIPT_DIR/files/w3p_installation-status.service /mnt/root/etc/systemd/system/w3p_installation-status.service
+# Activate the service – To ensure the service starts on boot, create a symbolic link in the appropriate directory.
+sudo ln -s /mnt/root/etc/systemd/system/w3p_installation-status.service /mnt/root/etc/systemd/system/multi-user.target.wants/w3p_installation-status.service
+
+
+
+
+
 
 # Delete default user-data file
 rm /mnt/boot/user-data
