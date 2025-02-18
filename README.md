@@ -1,6 +1,7 @@
 # image-creation-tool
 
 Bash script to generate a Web3Pi image (.img) based on Ubuntu 24.04.1 for Raspberry Pi.
+This script was tested on Ubuntu 24.04.
 
 ## Use
 
