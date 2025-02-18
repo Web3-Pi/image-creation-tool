@@ -8,7 +8,7 @@ Environment="JLOG_PATH=/opt/web3pi/status.jlog"
 Environment="LOG_PATH=/var/log/web3pi.log"
 ExecStart=/opt/web3pi/installation-status/installation-status-app
 Restart=always
-RestartSec=60s
+RestartSec=30s
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=network.target

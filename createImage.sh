@@ -161,8 +161,14 @@ wget https://dl.influxdata.com/influxdb/releases/influxdb_1.8.10_arm64.deb -P /m
 
 echo
 # pieeprom-2024-06-05.bin is with our config file
-cp $SCRIPT_DIR/fw/2712/pieeprom-2024-06-05.bin /mnt/root/lib/firmware/raspberrypi/bootloader-2712/default/
-cp $SCRIPT_DIR/fw/2711/pieeprom-2024-04-15.bin /mnt/root/lib/firmware/raspberrypi/bootloader-2711/default/
+#rm /mnt/root/lib/firmware/raspberrypi/bootloader-2712/default/pieeprom-*
+cp $SCRIPT_DIR/fw/2712/pieeprom-2025-01-13-w3p.bin /mnt/root/opt/web3pi/pieeprom-2025-01-13-w3p.bin
+
+# disable rpi-eeprom-update.service
+unlink /mnt/root/etc/systemd/system/multi-user.target.wants/rpi-eeprom-update.service
+
+# Disable unattended-upgrades.service 
+unlink /mnt/root/etc/systemd/system/multi-user.target.wants/unattended-upgrades.service 
 
 # rm $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip
 wget https://github.com/Web3-Pi/web3-pi-dashboard/releases/latest/download/web3-pi-dashboard-bin.zip -O $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip
@@ -182,7 +188,7 @@ ls -lh /mnt/root/opt/web3pi/influxdb
 cp $SCRIPT_DIR/files/w3p_lcd.service /mnt/root/etc/systemd/system/w3p_lcd.service
 
 # Activate the service – To ensure the service starts on boot, create a symbolic link in the appropriate directory.
-sudo ln -s /mnt/root/etc/systemd/system/w3p_lcd.service /mnt/root/etc/systemd/system/multi-user.target.wants/w3p_lcd.service
+ln -s /mnt/root/etc/systemd/system/w3p_lcd.service /mnt/root/etc/systemd/system/multi-user.target.wants/w3p_lcd.service
 
 
 
@@ -195,10 +201,7 @@ chmod +x /mnt/root/opt/web3pi/installation-status/installation-status-app
 # Create the service file for installation-status
 cp $SCRIPT_DIR/files/w3p_installation-status.service /mnt/root/etc/systemd/system/w3p_installation-status.service
 # Activate the service – To ensure the service starts on boot, create a symbolic link in the appropriate directory.
-sudo ln -s /mnt/root/etc/systemd/system/w3p_installation-status.service /mnt/root/etc/systemd/system/multi-user.target.wants/w3p_installation-status.service
-
-
-
+ln -s /mnt/root/etc/systemd/system/w3p_installation-status.service /mnt/root/etc/systemd/system/multi-user.target.wants/w3p_installation-status.service
 
 
 
