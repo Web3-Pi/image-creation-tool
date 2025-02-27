@@ -62,12 +62,12 @@ fi
 
 
 # If all validations pass, proceed with the script logic
-echo 
+echo
 echo "Generating Web3 Pi image with MODE: $MODE, BRANCH: $BRANCH"
 
 # Get the directory where the script is located
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-echo 
+echo
 echo "Script dir = $SCRIPT_DIR"
 
 # Create working dirs
@@ -79,26 +79,26 @@ mkdir -p $SCRIPT_DIR/tmp
 #apt-get install -y git qemu-utils kpartx unzip
 
 # Download official Ubuntu image for Raspberry Pi
-if [ -f "$SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img.xz" ]; then
+if [ -f "$SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img.xz" ]; then
   echo ".img.xz file allready exist."
 else
   echo "Downloading..."
-  wget https://cdimage.ubuntu.com/releases/24.04.1/release/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img.xz -P $SCRIPT_DIR/tmp
+  wget https://cdimage.ubuntu.com/releases/24.04.2/release/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img.xz -P $SCRIPT_DIR/tmp
 fi
 
 # Decompress .img.xz to .img
-if [ -f "$SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img" ]; then
-  echo ".img file allready exist. Deleting ubuntu-24.04.1-preinstalled-server-arm64+raspi.img"
-  rm $SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img
+if [ -f "$SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img" ]; then
+  echo ".img file allready exist. Deleting ubuntu-24.04.2-preinstalled-server-arm64+raspi.img"
+  rm $SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img
 fi
 echo "Decompressing..."
-xz --decompress -k -f -v $SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img.xz
+xz --decompress -k -f -v $SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img.xz
 
-echo 
+echo
 echo "ls -lh $SCRIPT_DIR/tmp/"
 ls -lh $SCRIPT_DIR/tmp/
 
-echo 
+echo
 modprobe nbd
 modprobe nbd max_part=16
 lsmod | grep nbd
@@ -106,7 +106,7 @@ chown root:disk /dev/nbd0
 qemu-nbd --disconnect /dev/nbd0
 
 # Attach the image
-qemu-nbd --format=raw --connect=/dev/nbd0 "$SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img"
+qemu-nbd --format=raw --connect=/dev/nbd0 "$SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img"
 
 # Check which partitions are available on the nbd0 device
 fdisk -l /dev/nbd0
@@ -115,7 +115,7 @@ fdisk -l /dev/nbd0
 mkdir -p /mnt/boot
 mount /dev/nbd0p1 /mnt/boot
 
-echo 
+echo
 echo "ls -lh /mnt/boot"
 ls -lh /mnt/boot
 
@@ -123,17 +123,18 @@ ls -lh /mnt/boot
 mkdir -p /mnt/root
 mount /dev/nbd0p2 /mnt/root
 
-echo 
+echo
 echo "ls -lh /mnt/root"
 ls -lh /mnt/root
 
 
-echo 
+echo
 mkdir -p /mnt/root/opt/web3pi
 
 git clone -b ${BRANCH} https://github.com/Web3-Pi/Ethereum-On-Raspberry-Pi.git /mnt/root/opt/web3pi/Ethereum-On-Raspberry-Pi
 git clone https://github.com/Web3-Pi/basic-system-monitor.git /mnt/root/opt/web3pi/basic-system-monitor
 git clone https://github.com/Web3-Pi/basic-eth2-node-monitor.git /mnt/root/opt/web3pi/basic-eth2-node-monitor
+git clone https://github.com/Web3-Pi/geth-sync-stages-monitoring.git /mnt/root/opt/web3pi/geth-sync-stages-monitoring
 
 cp /mnt/root/opt/web3pi/Ethereum-On-Raspberry-Pi/distros/raspberry_pi/rc.local /mnt/root/etc/rc.local
 chmod +x /mnt/root/etc/rc.local
@@ -167,8 +168,8 @@ cp $SCRIPT_DIR/fw/2712/pieeprom-2025-01-13-w3p.bin /mnt/root/opt/web3pi/pieeprom
 # disable rpi-eeprom-update.service
 unlink /mnt/root/etc/systemd/system/multi-user.target.wants/rpi-eeprom-update.service
 
-# Disable unattended-upgrades.service 
-unlink /mnt/root/etc/systemd/system/multi-user.target.wants/unattended-upgrades.service 
+# Disable unattended-upgrades.service
+unlink /mnt/root/etc/systemd/system/multi-user.target.wants/unattended-upgrades.service
 
 # rm $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip
 wget https://github.com/Web3-Pi/web3-pi-dashboard/releases/latest/download/web3-pi-dashboard-bin.zip -O $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip
@@ -229,7 +230,7 @@ if [ -f "$SCRIPT_DIR/output/$OUTPUT_FILE_NAME" ]; then
   rm $SCRIPT_DIR/output/$OUTPUT_FILE_NAME
 fi
 # Move ready file to output dir
-mv -f $SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img $SCRIPT_DIR/output/$OUTPUT_FILE_NAME
+mv -f $SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img $SCRIPT_DIR/output/$OUTPUT_FILE_NAME
 
 echo
 echo "Done! Modified image .img file is in output dir"
