@@ -79,20 +79,20 @@ mkdir -p $SCRIPT_DIR/tmp
 #apt-get install -y git qemu-utils kpartx unzip
 
 # Download official Ubuntu image for Raspberry Pi
-if [ -f "$SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img.xz" ]; then
+if [ -f "$SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img.xz" ]; then
   echo ".img.xz file allready exist."
 else
   echo "Downloading..."
-  wget https://cdimage.ubuntu.com/releases/24.04.1/release/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img.xz -P $SCRIPT_DIR/tmp
+  wget https://cdimage.ubuntu.com/releases/24.04.2/release/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img.xz -P $SCRIPT_DIR/tmp
 fi
 
 # Decompress .img.xz to .img
-if [ -f "$SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img" ]; then
-  echo ".img file allready exist. Deleting ubuntu-24.04.1-preinstalled-server-arm64+raspi.img"
-  rm $SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img
+if [ -f "$SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img" ]; then
+  echo ".img file allready exist. Deleting ubuntu-24.04.2-preinstalled-server-arm64+raspi.img"
+  rm $SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img
 fi
 echo "Decompressing..."
-xz --decompress -k -f -v $SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img.xz
+xz --decompress -k -f -v $SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img.xz
 
 echo 
 echo "ls -lh $SCRIPT_DIR/tmp/"
@@ -106,7 +106,7 @@ chown root:disk /dev/nbd0
 qemu-nbd --disconnect /dev/nbd0
 
 # Attach the image
-qemu-nbd --format=raw --connect=/dev/nbd0 "$SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img"
+qemu-nbd --format=raw --connect=/dev/nbd0 "$SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img"
 
 # Check which partitions are available on the nbd0 device
 fdisk -l /dev/nbd0
@@ -229,7 +229,7 @@ if [ -f "$SCRIPT_DIR/output/$OUTPUT_FILE_NAME" ]; then
   rm $SCRIPT_DIR/output/$OUTPUT_FILE_NAME
 fi
 # Move ready file to output dir
-mv -f $SCRIPT_DIR/tmp/ubuntu-24.04.1-preinstalled-server-arm64+raspi.img $SCRIPT_DIR/output/$OUTPUT_FILE_NAME
+mv -f $SCRIPT_DIR/tmp/ubuntu-24.04.2-preinstalled-server-arm64+raspi.img $SCRIPT_DIR/output/$OUTPUT_FILE_NAME
 
 echo
 echo "Done! Modified image .img file is in output dir"
