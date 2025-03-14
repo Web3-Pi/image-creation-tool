@@ -190,7 +190,11 @@ cp $SCRIPT_DIR/files/w3p_lcd.service /mnt/root/etc/systemd/system/w3p_lcd.servic
 # Activate the service – To ensure the service starts on boot, create a symbolic link in the appropriate directory.
 ln -s /mnt/root/etc/systemd/system/w3p_lcd.service /mnt/root/etc/systemd/system/multi-user.target.wants/w3p_lcd.service
 
-
+# MOTD update
+cp $SCRIPT_DIR/files/00-header /mnt/root/etc/update-motd.d/00-header
+cp $SCRIPT_DIR/files/10-help-text /mnt/root/etc/update-motd.d/10-help-text
+chmod +x /mnt/root/etc/update-motd.d/00-header
+chmod +x /mnt/root/etc/update-motd.d/10-help-text
 
 # installation-status
 # copy binnary app

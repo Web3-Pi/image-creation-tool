@@ -1,0 +1,6 @@
+#!/bin/sh
+
+printf "\n"
+printf " * Homepage:       https://Web3Pi.io\n"
+printf " * Documentation:  https://setup-guide.web3pi.io\n"
+printf " * Terms o Use:    https://web3pi.io/terms\n"
