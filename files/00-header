@@ -1,0 +1,14 @@
+#!/bin/bash
+
+[ -r /etc/lsb-release ] && . /etc/lsb-release
+
+if [ -z "$DISTRIB_DESCRIPTION" ] && [ -x /usr/bin/lsb_release ]; then
+        # Fall back to using the very slow lsb_release utility
+        DISTRIB_DESCRIPTION=$(lsb_release -s -d)
+fi
+
+
+# Display Web3 Pi logo
+printf "\e[38;2;170;57;111m%s\e[0m\n" "$(figlet -f small "Web3 Pi")"
+
+printf "Welcome to Web3 Pi based on %s (%s %s %s)\n" "$DISTRIB_DESCRIPTION" "$(uname -o)" "$(uname -r)" "$(uname -m)"
