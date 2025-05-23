@@ -171,8 +171,11 @@ unlink /mnt/root/etc/systemd/system/multi-user.target.wants/rpi-eeprom-update.se
 unlink /mnt/root/etc/systemd/system/multi-user.target.wants/unattended-upgrades.service 
 
 # rm $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip
-wget https://github.com/Web3-Pi/web3-pi-dashboard/releases/latest/download/web3-pi-dashboard-bin.zip -O $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip
+#wget https://github.com/Web3-Pi/web3-pi-dashboard/releases/latest/download/web3-pi-dashboard-bin.zip -O $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip
+#unzip $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip -d /mnt/root/opt/web3pi/
+wget https://github.com/Web3-Pi/web3-pi-dashboard/archive/refs/heads/hwmonitor-update.zip -O $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip
 unzip $SCRIPT_DIR/tmp/web3-pi-dashboard-bin.zip -d /mnt/root/opt/web3pi/
+mv /mnt/root/opt/web3pi/web3-pi-dashboard-hwmonitor-update /mnt/root/opt/web3pi/web3-pi-dashboard-bin
 
 chmod +x /mnt/root/opt/web3pi/web3-pi-dashboard-bin/hwmonitor
 
